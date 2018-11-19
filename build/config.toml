@@ -4,6 +4,10 @@ name = "cpb-project"
 directory = "src"
 entry = "main.cpp"
 files = []
+manager = "vcpkg"
+
+  [project.dependencies]
+  tinytoml = "x86-windows"
 
 [windows]
 compiler = "cl"

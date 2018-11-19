@@ -6,13 +6,19 @@ toml::Value * get_config(char * config_path);
 std::string get_string(toml::Value * config, char * key);
 
 int main() {
-  auto config = get_config("config.toml");
+  auto ifs = std::ifstream("config.toml");
+  auto config = toml::parse(ifs);
 
-  if (config == nullptr) {
+  if (!config.valid()) {
+    std::cout << "error when parsing config, " << config.errorReason << "\n";
+
     return 1;
   }
 
-  std::cout << get_string(config, "project.name") << std::endl;
+  auto & config_content = config.value;
+
+  auto project_name = get_string(&config_content, "project.name");
+  std::cout << project_name << std::endl;
 
   return 0;
 }
@@ -33,7 +39,7 @@ std::string get_string(toml::Value * config, char * key) {
   }
 
   return value->as<std::string>();
-}
+  }
 
 toml::Value * get_config(char * config_path) {
   auto ifs = std::ifstream(config_path);
