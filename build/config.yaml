@@ -1,0 +1,16 @@
+
+project:
+  name: cpb
+  directory: src
+  entry: main.cpp
+  files: []
+  manager: vcpkg
+  dependencies:
+     - yaml-cpp: x86-windows-static
+windows:
+  compiler: cl
+  args: ["/MD", "/EHsc"]
+
+linux:
+  compiler: g++
+  args: ["-Wall"]
