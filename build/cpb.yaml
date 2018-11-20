@@ -7,6 +7,7 @@ project:
   manager: vcpkg
   dependencies:
      - yaml-cpp: x86-windows-static
+
 windows:
   compiler: cl
   args: ["/MD", "/EHsc"]
