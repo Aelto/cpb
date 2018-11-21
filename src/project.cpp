@@ -118,18 +118,3 @@ Project * load_project_config(YAML::Node & config) {
 
   return project;
 }
-
-std::string get_value(
-  YAML::Node & node,
-  char * key,
-  bool required) {
-  
-  if (node[key]) {
-    return node[key].as<std::string>();
-  }
-  else if (required) {
-    std::cout << "required key was not found: " << key << "\n";
-  }
-
-  return std::string();
-}

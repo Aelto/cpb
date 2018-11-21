@@ -19,8 +19,3 @@ struct Project {
 };
 
 Project * load_project_config(YAML::Node & config);
-
-std::string get_value(
-  YAML::Node & node,
-  char * key,
-  bool required = false);
