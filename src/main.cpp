@@ -33,5 +33,9 @@ int main(int argc, char * argv[]) {
   auto config = YAML::LoadFile(config_path);
   auto * project = load_project_config(config);
 
+  if (project == nullptr) {
+    return 1;
+  }
+
   return 0;
 }

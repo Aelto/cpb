@@ -3,10 +3,12 @@ project:
   name: cpb
   directory: src
   entry: main.cpp
-  files: []
+  files: [
+    "project.cpp"
+  ]
   manager: vcpkg
   dependencies:
-     - yaml-cpp: x86-windows-static
+     yaml-cpp: x86-windows-static
 
 windows:
   compiler: cl
