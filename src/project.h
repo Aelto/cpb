@@ -18,4 +18,15 @@ struct Project {
   std::vector<Dependency> dependencies; 
 };
 
+struct WindowsOptions {
+  std::string compiler;
+  std::vector<std::string> args;
+};
+
+struct LinuxOptions {
+  std::string compiler;
+  std::vector<std::string> args;
+};
+
 Project * load_project_config(YAML::Node & config);
+WindowsOptions * load_windows_options(YAML::Node & config);

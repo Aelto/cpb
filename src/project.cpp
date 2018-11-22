@@ -118,3 +118,60 @@ Project * load_project_config(YAML::Node & config) {
 
   return project;
 }
+
+WindowsOptions * load_windows_options(YAML::Node & config) {
+  auto * new_windows_options = new WindowsOptions; 
+
+  #ifdef DEBUG
+    std::cout << "loading windows options\n";
+  #endif
+
+  if (!config["windows"]) {
+    #ifdef DEBUG
+      std::cout << "could not find windows group in config\n";
+    #endif
+
+    return nullptr;
+  }
+
+  auto & windows_config = config["windows"];
+
+  if (windows_config["compiler"]) {
+    new_windows_options->compiler = windows_config["compiler"]
+      .as<std::string>();
+
+    #ifdef DEBUG
+      std::cout
+        << "found windows compiler: "
+        << new_windows_options->compiler
+        << "\n";
+    #endif
+  }
+  else {
+    std::cout << "using default windows compiler: cl\n";
+
+    new_windows_options->compiler = "cl";
+  }
+
+  if (windows_config["args"]) {
+    auto args = windows_config["args"];
+
+    for (auto it = args.begin(); 
+         it != args.end();
+         ++it) {
+      auto new_file = it->as<std::string>();
+
+      #ifdef DEBUG
+        std::cout 
+          << "adding arg: "
+          << new_file
+          << "\n";
+      #endif
+
+      new_windows_options->args.push_back(new_file);
+    }
+  }
+
+  return new_windows_options;
+}
+
