@@ -52,7 +52,9 @@ int main(int argc, char * argv[]) {
   }
 
   if (platforms_build.windows) {
-    auto * windows = load_windows_options(config);
+    auto * windows = load_system_options(config, "windows");
+
+    auto success = execute_system_options_windows(project, windows);
   }
   
   std::cout << "done.\n";

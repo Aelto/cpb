@@ -16,17 +16,17 @@ struct Project {
   std::vector<std::string> files;
   std::string manager;
   std::vector<Dependency> dependencies; 
+  std::vector<std::string> libraries;
+  std::vector<std::string> directories;
 };
 
-struct WindowsOptions {
-  std::string compiler;
-  std::vector<std::string> args;
-};
-
-struct LinuxOptions {
+struct SystemOptions {
   std::string compiler;
   std::vector<std::string> args;
 };
 
 Project * load_project_config(YAML::Node & config);
-WindowsOptions * load_windows_options(YAML::Node & config);
+
+SystemOptions * load_system_options(YAML::Node & config, char * system_name);
+
+bool execute_system_options_windows(Project * project, SystemOptions * system_options);

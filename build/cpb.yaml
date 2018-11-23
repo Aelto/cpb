@@ -1,10 +1,16 @@
 
 project:
   name: cpb
-  directory: src
+  directory: ../src/
   entry: main.cpp
   files: [
     "project.cpp"
+  ]
+  libraries: [
+    "c:/files/cpp/vcpkg/installed/x86-windows-static/lib/libyaml-cppmd.lib"
+  ]
+  directories: [
+    "c:/files/cpp/vcpkg/installed/x86-windows-static/include"
   ]
   manager: vcpkg
   dependencies:
@@ -12,7 +18,10 @@ project:
 
 windows:
   compiler: cl
-  args: ["/MD", "/EHsc"]
+  args: [
+    "/EHsc", 
+    # "/DDEBUG"
+  ]
 
 linux:
   compiler: g++

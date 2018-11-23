@@ -97,6 +97,25 @@ Project * load_project_config(YAML::Node & config) {
     }
   }
 
+  if (project_config["libraries"]) {
+    auto libraries = project_config["libraries"];
+
+    for (auto it = libraries.begin();
+         it !=  libraries.end();
+         ++it) {
+      auto new_library = it->as<std::string>();
+      
+      #ifdef DEBUG
+        std::cout 
+          << "adding library: "
+          << new_library
+          << "\n";
+      #endif
+
+      project->libraries.push_back(new_library);
+    }
+  }
+
   if (project_config["files"]) {
     auto files = project_config["files"];
 
@@ -116,17 +135,40 @@ Project * load_project_config(YAML::Node & config) {
     }
   }
 
+  if (project_config["directories"]) {
+    auto directories = project_config["directories"];
+
+    for (auto it = directories.begin(); 
+         it != directories.end();
+         ++it) {
+      auto new_directory = it->as<std::string>();
+
+      #ifdef DEBUG
+        std::cout 
+          << "adding include directory: "
+          << new_directory
+          << "\n";
+      #endif
+
+      project->directories.push_back(new_directory);
+    }
+  }
+
+
   return project;
 }
 
-WindowsOptions * load_windows_options(YAML::Node & config) {
-  auto * new_windows_options = new WindowsOptions; 
+SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
+  auto * new_system_options = new SystemOptions; 
 
   #ifdef DEBUG
-    std::cout << "loading windows options\n";
+    std::cout 
+      << "loading " 
+      << system_name
+      << " options\n";
   #endif
 
-  if (!config["windows"]) {
+  if (!config[system_name]) {
     #ifdef DEBUG
       std::cout << "could not find windows group in config\n";
     #endif
@@ -134,27 +176,27 @@ WindowsOptions * load_windows_options(YAML::Node & config) {
     return nullptr;
   }
 
-  auto & windows_config = config["windows"];
+  auto & system_config = config[system_name];
 
-  if (windows_config["compiler"]) {
-    new_windows_options->compiler = windows_config["compiler"]
+  if (system_config["compiler"]) {
+    new_system_options->compiler = system_config["compiler"]
       .as<std::string>();
 
     #ifdef DEBUG
       std::cout
         << "found windows compiler: "
-        << new_windows_options->compiler
+        << new_system_options->compiler
         << "\n";
     #endif
   }
   else {
     std::cout << "using default windows compiler: cl\n";
 
-    new_windows_options->compiler = "cl";
+    new_system_options->compiler = "cl";
   }
 
-  if (windows_config["args"]) {
-    auto args = windows_config["args"];
+  if (system_config["args"]) {
+    auto args = system_config["args"];
 
     for (auto it = args.begin(); 
          it != args.end();
@@ -168,10 +210,46 @@ WindowsOptions * load_windows_options(YAML::Node & config) {
           << "\n";
       #endif
 
-      new_windows_options->args.push_back(new_file);
+      new_system_options->args.push_back(new_file);
     }
   }
 
-  return new_windows_options;
+  return new_system_options;
 }
 
+bool execute_system_options_windows(Project * project, SystemOptions * system_options) {
+  std::string command = "cl ";
+
+  for (auto arg : system_options->args) {
+    command += arg + " ";
+  }
+
+  command += project->directory + project->entry + " ";
+
+  for (auto file_name : project->files) {
+    command += project->directory + file_name + " ";
+  }
+
+  for (auto directory : project->directories) {
+    command += "/I " + directory + " ";
+  }
+
+  if (project->libraries.size() > 0) {
+    command += "/link";
+
+    for (auto library : project->libraries) {
+      command += library + " ";
+    }
+  }
+
+  #ifdef DEBUG
+    std::cout
+      << "running command "
+      << command
+      << "\n";
+  #endif
+
+  system(command.c_str());
+
+  return true;
+}
