@@ -3,6 +3,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "project.h"
+#include "system.h"
 
 struct BuildingPlatform {
   bool linux;
@@ -54,7 +55,12 @@ int main(int argc, char * argv[]) {
   if (platforms_build.windows) {
     auto * windows = load_system_options(config, "windows");
 
-    auto success = execute_system_options_windows(project, windows);
+    if (project->type == Binary) {
+      auto success = execute_system_options_windows(project, windows);
+    }
+    else {
+      // TODO: library project type
+    }
   }
   
   std::cout << "done.\n";
@@ -66,15 +72,15 @@ BuildingPlatform get_building_platform(int argc, char * argv[]) {
   BuildingPlatform platforms { false, false, false };
 
   for (int i = 0; i < argc; i++) {
-    if (strcmp(argv[i], "--windows") == 0) {
+    if (strcmp(argv[i], "-windows") == 0) {
       platforms.windows = true;
     }
 
-    if (strcmp(argv[i], "--linux") == 0) {
+    if (strcmp(argv[i], "-linux") == 0) {
       platforms.linux = true;
     }
 
-    if (strcmp(argv[i], "--macos") == 0) {
+    if (strcmp(argv[i], "-macos") == 0) {
       platforms.macos = true;
     }
   }

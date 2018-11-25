@@ -1,26 +1,33 @@
 
 project:
   name: cpb
-  directory: ../src/
-  entry: main.cpp
-  files: [
-    "project.cpp"
-  ]
-  libraries: [
-    "c:/files/cpp/vcpkg/installed/x86-windows-static/lib/libyaml-cppmd.lib"
-  ]
-  directories: [
-    "c:/files/cpp/vcpkg/installed/x86-windows-static/include"
-  ]
-  manager: vcpkg
-  dependencies:
-     yaml-cpp: x86-windows-static
+  type: bin
 
 windows:
   compiler: cl
   args: [
     "/EHsc", 
-    # "/DDEBUG"
+    "/DDEBUG"
+  ]
+
+  manager: vcpkg
+  dependencies:
+     yaml-cpp: x86-windows-static
+
+  directory: ../src/
+  files: [
+    main.cpp,
+    project.cpp,
+    system.cpp
+  ]
+
+  include_directories: [
+    "%vcpkg_static%/include"
+  ]
+
+  lib_directory: "%vcpkg_static%/lib/"
+  libraries: [
+    libyaml-cppmd.lib
   ]
 
 linux:
