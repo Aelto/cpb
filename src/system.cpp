@@ -13,7 +13,10 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
 
   if (!config[system_name]) {
     #ifdef DEBUG
-      std::cout << "could not find windows group in config\n";
+      std::cout
+      << "could not find "
+      << system_name
+      << " group in config\n";
     #endif
 
     return nullptr;
@@ -28,18 +31,18 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
     #ifdef DEBUG
       std::cout
         << "found windows compiler: "
-        << new_system_options->compiler
+        << new_system_options->compiler.value()
         << "\n";
     #endif
-  }
-  else {
-    std::cout << "using default windows compiler: cl\n";
-
-    new_system_options->compiler = "cl";
   }
 
   if (system_config["args"]) {
     auto args = system_config["args"];
+    
+    new_system_options->args = std::vector<std::string>();
+    // new_system_options->args
+    //   .value()
+    //   .resize(args.size());
 
     for (auto it = args.begin(); 
          it != args.end();
@@ -53,7 +56,9 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
           << "\n";
       #endif
 
-      new_system_options->args.push_back(new_file);
+      new_system_options->args
+        .value()
+        .push_back(new_file);
     }
   }
 
@@ -61,19 +66,14 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
     new_system_options->directory = system_config["directory"]
       .as<std::string>();
   }
-  else {
-    const auto default_directory = std::string(".");
-
-    std::cout 
-      << "using default value for system options directory: "
-      << default_directory
-      << "\n";
-
-    new_system_options->directory = default_directory;
-  }
 
   if (system_config["include_directories"]) {
     auto include_directories = system_config["include_directories"];
+
+    new_system_options->include_directories = std::vector<std::string>();
+    // new_system_options->include_directories
+    //   .value()
+    //   .resize(include_directories.size());
 
     for (auto it = include_directories.begin(); 
          it != include_directories.end();
@@ -87,12 +87,19 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
           << "\n";
       #endif
 
-      new_system_options->include_directories.push_back(new_directory);
+      new_system_options->include_directories
+        .value()
+        .push_back(new_directory);
     }
   }
 
   if (system_config["files"]) {
     auto files = system_config["files"];
+
+    new_system_options->files = std::vector<std::string>();
+    // new_system_options->files
+    //   .value()
+    //   .resize(files.size());
 
     for (auto it = files.begin(); 
          it != files.end();
@@ -106,12 +113,19 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
           << "\n";
       #endif
 
-      new_system_options->files.push_back(new_file);
+      new_system_options->files
+        .value()
+        .push_back(new_file);
     }
   }
 
   if (system_config["libraries"]) {
     auto libraries = system_config["libraries"];
+
+    new_system_options->libs = std::vector<std::string>();
+    // new_system_options->libs
+    //   .value()
+    //   .resize(libraries.size());
 
     for (auto it = libraries.begin();
          it !=  libraries.end();
@@ -125,7 +139,9 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
           << "\n";
       #endif
 
-      new_system_options->libs.push_back(new_library);
+      new_system_options->libs
+        .value()
+        .push_back(new_library);
     }
   }
 
@@ -135,13 +151,18 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
     #if DEBUG
       std::cout 
         << "setting lib directory: "
-        << new_system_options->lib_directory
+        << new_system_options->lib_directory.value()
         << "\n";
     #endif
   }
 
   if (system_config["dependencies"]) {
     auto dependencies = system_config["dependencies"];
+
+    new_system_options->dependencies = std::vector<Dependency>();
+    new_system_options->dependencies
+      .value()
+      .resize(dependencies.size());
 
     for (auto it = dependencies.begin(); 
          it != dependencies.end();
@@ -160,7 +181,9 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
           << "\n";
       #endif
 
-      new_system_options->dependencies.push_back(new_dependency);
+      new_system_options->dependencies
+        .value()
+        .push_back(new_dependency);
     }
   }
 
@@ -171,55 +194,10 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
     #ifdef DEBUG
       std::cout 
         << "adding manager: "
-        << new_system_options->manager
+        << new_system_options->manager.value()
         << "\n";
     #endif
   }
-  else {
-    const auto default_manager = std::string("vcpkg");
-
-    std::cout
-      << "using default value for project manager: "
-      << default_manager
-      << "\n";
-
-    new_system_options->manager = default_manager;
-  }
 
   return new_system_options;
-}
-
-bool execute_system_options_windows(Project * project, SystemOptions * system_options) {
-  std::string command = "cl ";
-
-  for (auto arg : system_options->args) {
-    command += arg + " ";
-  }
-
-  for (auto file_name : system_options->files) {
-    command += system_options->directory + file_name + " ";
-  }
-
-  for (auto directory : system_options->include_directories) {
-    command += "/I " + directory + " ";
-  }
-
-  if (system_options->libs.size() > 0) {
-    command += "/link";
-
-    for (auto library : system_options->libs) {
-      command += system_options->lib_directory + library + " ";
-    }
-  }
-
-  #ifdef DEBUG
-    std::cout
-      << "running command "
-      << command
-      << "\n";
-  #endif
-
-  system(command.c_str());
-
-  return true;
 }

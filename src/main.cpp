@@ -4,6 +4,7 @@
 
 #include "project.h"
 #include "system.h"
+#include "systems/windows.h"
 
 struct BuildingPlatform {
   bool linux;
@@ -52,11 +53,13 @@ int main(int argc, char * argv[]) {
     return 1;
   }
 
+  auto * shared = load_system_options(config, "shared");
+
   if (platforms_build.windows) {
     auto * windows = load_system_options(config, "windows");
 
     if (project->type == Binary) {
-      auto success = execute_system_options_windows(project, windows);
+      auto success = systems::execute_windows(project, windows, shared);
     }
     else {
       // TODO: library project type

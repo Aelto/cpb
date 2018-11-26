@@ -7,19 +7,13 @@ windows:
   compiler: cl
   args: [
     "/EHsc", 
-    "/DDEBUG"
+    "/DDEBUG",
+    "/std:c++17"
   ]
 
   manager: vcpkg
   dependencies:
      yaml-cpp: x86-windows-static
-
-  directory: ../src/
-  files: [
-    main.cpp,
-    project.cpp,
-    system.cpp
-  ]
 
   include_directories: [
     "%vcpkg_static%/include"
@@ -33,3 +27,12 @@ windows:
 linux:
   compiler: g++
   args: ["-Wall"]
+
+shared:
+  directory: ../src/
+  files: [
+    main.cpp,
+    project.cpp,
+    system.cpp,
+    systems/windows.cpp
+  ]
