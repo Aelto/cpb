@@ -157,12 +157,12 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
   }
 
   if (system_config["dependencies"]) {
-    auto dependencies = system_config["dependencies"];
+    auto & dependencies = system_config["dependencies"];
 
     new_system_options->dependencies = std::vector<Dependency>();
-    new_system_options->dependencies
-      .value()
-      .resize(dependencies.size());
+    // new_system_options->dependencies
+    //   .value()
+    //   .resize(dependencies.size());
 
     for (auto it = dependencies.begin(); 
          it != dependencies.end();
@@ -197,6 +197,56 @@ SystemOptions * load_system_options(YAML::Node & config, char * system_name) {
         << new_system_options->manager.value()
         << "\n";
     #endif
+  }
+
+  if (system_config["commands"]) {
+    auto & commands = system_config["commands"];
+
+    if (commands["before"]) {
+      auto & before_commands = commands["before"];
+
+      new_system_options->commands.before = std::vector<std::string>();
+
+      for (auto it = before_commands.begin(); 
+         it != before_commands.end();
+         ++it) {
+        auto new_before_command = it->as<std::string>();
+
+        #ifdef DEBUG
+          std::cout 
+            << "adding before command: "
+            << before_commands
+            << "\n";
+        #endif
+
+        new_system_options->commands.before
+          .value()
+          .push_back(new_before_command);
+      }
+    }
+
+    if (commands["after"]) {
+      auto & after_commands = commands["after"];
+
+      new_system_options->commands.after = std::vector<std::string>();
+
+      for (auto it = after_commands.begin(); 
+         it != after_commands.end();
+         ++it) {
+        auto new_before_command = it->as<std::string>();
+
+        #ifdef DEBUG
+          std::cout 
+            << "adding after command: "
+            << after_commands
+            << "\n";
+        #endif
+
+        new_system_options->commands.after
+          .value()
+          .push_back(new_before_command);
+      }
+    }
   }
 
   return new_system_options;

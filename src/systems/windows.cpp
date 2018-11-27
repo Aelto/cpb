@@ -2,7 +2,32 @@
 
 #include <iostream>
 
-bool systems::execute_windows(Project * project, SystemOptions * system_options, SystemOptions * default_system_options) {
+bool systems::execute_windows(
+  Project * project,
+  SystemOptions * system_options,
+  SystemOptions * default_system_options,
+  CpbOptions & cpb_options) {
+
+  if (cpb_options.allow_commands) {
+    auto before_commands = system_options
+      ->commands.before.value_or(
+        default_system_options == nullptr 
+          ? std::vector<std::string>()
+          : default_system_options
+            ->commands.before.value_or(std::vector<std::string>())
+      );
+
+
+    for (auto & before_command : before_commands) {
+      std::cout 
+        << "running command: "
+        << before_command
+        << "\n";
+
+      system(before_command.c_str());
+    }
+  }
+
   std::string command = "cl "; // TODO: use compiler from config
 
   auto args = system_options
@@ -76,6 +101,27 @@ bool systems::execute_windows(Project * project, SystemOptions * system_options,
   #endif
 
   system(command.c_str());
+
+  if (cpb_options.allow_commands) {
+    auto after_commands = system_options
+      ->commands.after.value_or(
+        default_system_options == nullptr 
+          ? std::vector<std::string>()
+          : default_system_options
+            ->commands.after.value_or(std::vector<std::string>())
+      );
+
+
+    for (auto & after_command : after_commands) {
+      std::cout 
+        << "running command: "
+        << after_command
+        << "\n";
+
+      system(after_command.c_str());
+    }
+  }
+
 
   return true;
 }

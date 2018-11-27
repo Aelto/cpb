@@ -1,18 +1,10 @@
 #include <iostream>
-#include <string>
 #include <yaml-cpp/yaml.h>
 
 #include "project.h"
 #include "system.h"
 #include "systems/windows.h"
-
-struct BuildingPlatform {
-  bool linux;
-  bool windows;
-  bool macos;
-};
-
-BuildingPlatform get_building_platform(int argc, char * argv[]);
+#include "options.h"
 
 int main(int argc, char * argv[]) {
   #ifdef DEBUG
@@ -21,21 +13,21 @@ int main(int argc, char * argv[]) {
     }
   #endif
 
-  auto platforms_build = get_building_platform(argc, argv);
+  auto cpb_options = get_cpb_options(argc, argv);
 
   std::cout 
     << "building for windows: "
-    << platforms_build.windows
+    << cpb_options.windows
     << "\n";
 
   std::cout 
     << "building for linux: "
-    << platforms_build.linux
+    << cpb_options.linux
     << "\n";
 
   std::cout 
     << "building for macos: "
-    << platforms_build.macos
+    << cpb_options.macos
     << "\n";
 
   std::string config_path = "cpb.yaml";
@@ -55,11 +47,11 @@ int main(int argc, char * argv[]) {
 
   auto * shared = load_system_options(config, "shared");
 
-  if (platforms_build.windows) {
+  if (cpb_options.windows) {
     auto * windows = load_system_options(config, "windows");
 
     if (project->type == Binary) {
-      auto success = systems::execute_windows(project, windows, shared);
+      auto success = systems::execute_windows(project, windows, shared, cpb_options);
     }
     else {
       // TODO: library project type
@@ -69,24 +61,4 @@ int main(int argc, char * argv[]) {
   std::cout << "done.\n";
 
   return 0;
-}
-
-BuildingPlatform get_building_platform(int argc, char * argv[]) {
-  BuildingPlatform platforms { false, false, false };
-
-  for (int i = 0; i < argc; i++) {
-    if (strcmp(argv[i], "-windows") == 0) {
-      platforms.windows = true;
-    }
-
-    if (strcmp(argv[i], "-linux") == 0) {
-      platforms.linux = true;
-    }
-
-    if (strcmp(argv[i], "-macos") == 0) {
-      platforms.macos = true;
-    }
-  }
-
-  return platforms;
 }

@@ -9,6 +9,12 @@ struct Dependency {
   std::string version;
 };
 
+struct Commands {
+  std::optional<std::vector<std::string>> before;
+  std::optional<std::vector<std::string>> after;
+};
+
+
 struct SystemOptions {
   std::optional<std::string> compiler;
   std::optional<std::vector<std::string>> args;
@@ -23,6 +29,8 @@ struct SystemOptions {
   
   std::optional<std::string> lib_directory;
   std::optional<std::vector<std::string>> libs;
+
+  Commands commands;
 };
 
 SystemOptions * load_system_options(YAML::Node & config, char * system_name);
