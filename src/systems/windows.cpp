@@ -17,7 +17,6 @@ bool systems::execute_windows(
             ->commands.before.value_or(std::vector<std::string>())
       );
 
-
     for (auto & before_command : before_commands) {
       std::cout 
         << "running command: "
@@ -28,8 +27,16 @@ bool systems::execute_windows(
     }
   }
 
-  std::string command = "cl "; // TODO: use compiler from config
+  auto compiler_name = system_options
+    ->compiler.value_or(
+      default_system_options == nullptr 
+        ? std::string()
+        : default_system_options
+          ->compiler.value_or("cl")
+    );
 
+  std::string command = compiler_name;
+  
   auto args = system_options
     ->args.value_or(
       default_system_options == nullptr 
