@@ -22,6 +22,10 @@ bool systems::execute_windows(
     auto ymlfile_wtime = fs::last_write_time(ymlfile_path);
 
     if (ymlfile_wtime > dotfile_wtime) {
+      #ifdef DEBUG
+        std::cout << "full rebuild: 1\n";
+      #endif
+
       full_rebuild = true;
     }
     
@@ -60,7 +64,7 @@ bool systems::execute_windows(
           ->compiler.value_or("cl")
     );
 
-  std::string command = compiler_name;
+  std::string command = compiler_name + "  ";
   
   auto args = system_options
     ->args.value_or(
@@ -89,6 +93,7 @@ bool systems::execute_windows(
     );
   for (auto file_name : files) {
     auto file = fs::path(directory) / file_name;
+    
     if (!fs::exists(file)) {
       std::cout
         << "could not find file: "
@@ -98,12 +103,15 @@ bool systems::execute_windows(
       continue;
     }
 
-    auto file_wtime = fs::last_write_time(file);
     auto obj_file = fs::current_path() / fs::path(file_name).filename().replace_extension(".obj");
 
-    if (fs::exists(obj_file) && !full_rebuild) {
-      auto obj_wtime = fs::last_write_time(obj_file);
+    auto header_file = (fs::path(directory) / file_name).replace_extension(".h");
+    auto should_rebuild = true;
 
+    if (!full_rebuild && fs::exists(obj_file)) {
+      // no full project build is needed,
+      // .obj file was found
+      
       #ifdef DEBUG
         std::cout
           << "found obj file: "
@@ -111,15 +119,21 @@ bool systems::execute_windows(
           << "\n";
       #endif
 
-      if (obj_wtime > file_wtime) {
-        // file_wtime older than obj_wtime
-        command += obj_file.filename().string() + " ";
+      auto obj_wtime = fs::last_write_time(obj_file);
+      auto header_file_changed = fs::exists(header_file) 
+        && fs::last_write_time(header_file) > obj_wtime;
+      auto cpp_file_changed = fs::exists(file)
+        && fs::last_write_time(file) > obj_wtime;
 
-        continue;
-      }
+      should_rebuild = header_file_changed || cpp_file_changed;
     }
 
-    command += directory + file_name + " ";
+    if (should_rebuild) {
+      command += directory + file_name + " ";
+    }
+    else {
+      command += obj_file.filename().string() + " ";
+    }
   }
 
   auto include_directories = system_options
