@@ -7,6 +7,10 @@ CpbOptions get_cpb_options(int argc, char * argv[]) {
 
   for (int i = 0; i < argc; i++) {
     auto & current_arg = argv[i];
+
+    if (strcmp(current_arg, "--init") == 0 || strcmp(current_arg, "-i") == 0) {
+      options.init = true;
+    }
     
     if (strcmp(current_arg, "--windows") == 0 || strcmp(current_arg, "-w") == 0) {
       options.windows = true;

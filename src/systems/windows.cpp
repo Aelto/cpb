@@ -188,7 +188,6 @@ bool systems::execute_windows(
             ->commands.after.value_or(std::vector<std::string>())
       );
 
-
     for (auto & after_command : after_commands) {
       std::cout 
         << "running command: "
@@ -198,7 +197,6 @@ bool systems::execute_windows(
       system(after_command.c_str());
     }
   }
-
 
   return true;
 }

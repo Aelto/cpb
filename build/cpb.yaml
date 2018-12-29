@@ -43,5 +43,6 @@ shared:
     project.cpp,
     system.cpp,
     options.cpp,
-    systems/windows.cpp
+    systems/windows.cpp,
+    init.cpp
   ]
