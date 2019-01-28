@@ -1,0 +1,48 @@
+
+project:
+  name: cpb
+  type: bin
+
+windows:
+  compiler: cl
+  args: [
+    "/EHsc", 
+    # "/DDEBUG",
+    "/std:c++17"
+  ]
+
+  manager: vcpkg
+  dependencies:
+     yaml-cpp: x86-windows-static
+
+  include_directories: [
+    "%vcpkg_static%/include"
+  ]
+
+  lib_directory: "%vcpkg_static%/lib/"
+  libraries: [
+    libyaml-cppmd.lib
+  ]
+
+  commands:
+    before: [
+      "del *.obj"
+    ]
+    after: [
+      "del *.obj"
+    ]
+
+linux:
+  compiler: g++
+  args: ["-Wall"]
+
+shared:
+  directory: ../src/
+  files: [
+    main.cpp,
+    project.cpp,
+    system.cpp,
+    options.cpp,
+    systems/windows.cpp,
+    init.cpp
+  ]
